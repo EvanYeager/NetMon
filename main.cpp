@@ -142,7 +142,6 @@ void makePanels(int y, int x) {
 	 	mvwprintw(footer, 1, 2, "Controls: [Q]uit | [R]efresh | [P]ause");
 	 	wattroff(footer, WA_BOLD);
 	 	wrefresh(footer);
-	 	std::cout << "y: " << y << " x: " << x;
 	}
 
 	void initColors() {
