@@ -1,2 +1,2 @@
 # NetMon
-Terminal-based network monitor that measures internet connection strength.
+Terminal-based tool to measure internet connection strength.
