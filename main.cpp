@@ -2,10 +2,18 @@
 
 #include <iostream>
 
+<<<<<<< HEAD
 const int HEADER_HEIGHT = 4;
 const int MAIN_HEIGHT = 7;
 const int MAIN_PANEL_MIN_WIDTH = 30;
 const int FOOTER_HEIGHT = 6;
+=======
+class NetMon {
+	const int HEADER_HEIGHT = 4;
+	const int MAIN_HEIGHT_MIN = 11;
+	const int MAIN_HEIGHT_MAX = 17;
+	const int FOOTER_HEIGHT = 6;
+>>>>>>> 75210fc (add dynamic main panel height)
 
 WINDOW* header;
 WINDOW* strength;
@@ -33,6 +41,7 @@ void makePanels(int y, int x) {
 	wattroff(header, WA_BOLD | WA_UNDERLINE);
 	wrefresh(header);
 
+<<<<<<< HEAD
 	// strength panel
  	strength = newwin(MAIN_HEIGHT, MAIN_PANEL_MIN_WIDTH, HEADER_HEIGHT + 1, 0);
  	box(strength, 0, 0);
@@ -58,6 +67,100 @@ void makePanels(int y, int x) {
  	mvwprintw(footer, 1, 2, "Controls: [Q]uit | [R]efresh | [P]ause");
  	wattroff(footer, WA_BOLD);
  	wrefresh(footer); 
+=======
+		initColors();
+
+		refresh();
+
+		int y, x;
+		getmaxyx(stdscr, y, x);		/* get the number of rows and columns */
+
+
+		makePanels(y, x);
+		
+
+		while (true) {
+			int ch = getch();
+
+			if (ch == 'q' || ch == 'Q') {
+				break;
+			}
+			if (ch == 'p' || ch == 'P') {
+				paused = !paused;
+			}
+		}
+
+	   	delwin(header);
+	   	delwin(strength);
+	   	delwin(speed);
+	   	delwin(footer);
+		endwin();			/* End curses mode		  */
+
+	}
+
+
+	void makePanels(int y, int x) {
+		// header
+		header = newwin(HEADER_HEIGHT, x, 0, 0);
+		wbkgd(header, COLOR_PAIR(5));
+		box(header, 0, 0);
+		wattron(header, WA_BOLD | WA_UNDERLINE);
+		mvwprintw(header, 1, (x - 25) /2, "NETWORK STRENGTH MONITOR");
+		wattroff(header, WA_BOLD | WA_UNDERLINE);
+		wrefresh(header);
+
+		int mainHeight = MAIN_HEIGHT_MIN;
+		int space = y - HEADER_HEIGHT - FOOTER_HEIGHT - 2;
+		if (space > MAIN_HEIGHT_MIN) {
+			mainHeight = space;
+		}
+		if (space > MAIN_HEIGHT_MAX) {
+			mainHeight = MAIN_HEIGHT_MAX;
+		}
+
+		// strength panel
+	 	strength = newwin(mainHeight, x / 2 - 1, HEADER_HEIGHT + 1, 0);
+	 	box(strength, 0, 0);
+	 	wattron(strength, WA_BOLD);
+	 	mvwprintw(strength, 0, 2, "Network Strength");
+	 	wattroff(strength, WA_BOLD);
+	 	wrefresh(strength);
+	 
+	 	// speed panel
+	 	speed = newwin(mainHeight, x / 2 - 1, HEADER_HEIGHT + 1, x / 2 + 1);
+	 	box(speed, 0, 0);
+	 	wattron(speed, WA_BOLD);
+	 	mvwprintw(speed, 0, 2, "Network Speed");
+	 	wattroff(speed, WA_BOLD);
+	 	wrefresh(speed);	
+	 
+	 	// footer
+	 	footer = newwin(FOOTER_HEIGHT, x, y - FOOTER_HEIGHT - 1, 0);
+	 	box(footer, 0, 0);
+	 	wattron(footer, WA_BOLD | WA_UNDERLINE);
+	 	wattroff(footer, WA_UNDERLINE);
+	 	mvwprintw(footer, 1, 2, "Controls: [Q]uit | [R]efresh | [P]ause");
+	 	wattroff(footer, WA_BOLD);
+	 	wrefresh(footer);
+	 	std::cout << "y: " << y << " x: " << x;
+	}
+
+	void initColors() {
+		start_color();
+		init_pair(1, COLOR_GREEN, COLOR_BLACK);		// good
+		init_pair(2, COLOR_YELLOW, COLOR_BLACK);	// warning
+		init_pair(3, COLOR_RED, COLOR_BLACK);		// critical
+		init_pair(4, COLOR_CYAN, COLOR_BLACK);		// header
+		init_pair(5, COLOR_WHITE, COLOR_BLACK);		// title bar
+	}
+
+};
+
+int main() {
+	NetMon monitor;
+	monitor.run();
+	return 0;
+>>>>>>> 75210fc (add dynamic main panel height)
 }
 
 
