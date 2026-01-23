@@ -1,6 +1,7 @@
 #include <ncurses.h>
 
 #include <iostream>
+#include "footer.cpp"
 
 <<<<<<< HEAD
 const int HEADER_HEIGHT = 4;
@@ -137,11 +138,10 @@ void makePanels(int y, int x) {
 	 	// footer
 	 	footer = newwin(FOOTER_HEIGHT, x, y - FOOTER_HEIGHT - 1, 0);
 	 	box(footer, 0, 0);
-	 	wattron(footer, WA_BOLD | WA_UNDERLINE);
-	 	wattroff(footer, WA_UNDERLINE);
-	 	mvwprintw(footer, 1, 2, "Controls: [Q]uit | [R]efresh | [P]ause");
-	 	wattroff(footer, WA_BOLD);
-	 	wrefresh(footer);
+
+		Footer footerPrinter(footer);
+		footerPrinter.makeFooter();
+	 	
 	}
 
 	void initColors() {

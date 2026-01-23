@@ -41,6 +41,6 @@
 *.dwo
 
 # Ignore all files that do not have a dot in their name
-!*.*
 *
 !*/
+!*.*
