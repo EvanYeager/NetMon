@@ -11,8 +11,8 @@ const int FOOTER_HEIGHT = 6;
 =======
 class NetMon {
 	const int HEADER_HEIGHT = 4;
-	const int MAIN_HEIGHT_MIN = 11;
-	const int MAIN_HEIGHT_MAX = 17;
+	const int MAIN_HEIGHT = 11;
+	const int MAIN_PANEL_WIDTH = 40;
 	const int FOOTER_HEIGHT = 6;
 >>>>>>> 75210fc (add dynamic main panel height)
 
@@ -110,17 +110,8 @@ void makePanels(int y, int x) {
 		wattroff(header, WA_BOLD | WA_UNDERLINE);
 		wrefresh(header);
 
-		int mainHeight = MAIN_HEIGHT_MIN;
-		int space = y - HEADER_HEIGHT - FOOTER_HEIGHT - 2;
-		if (space > MAIN_HEIGHT_MIN) {
-			mainHeight = space;
-		}
-		if (space > MAIN_HEIGHT_MAX) {
-			mainHeight = MAIN_HEIGHT_MAX;
-		}
-
 		// strength panel
-	 	strength = newwin(mainHeight, x / 2 - 1, HEADER_HEIGHT + 1, 0);
+	 	strength = newwin(MAIN_HEIGHT, MAIN_PANEL_WIDTH, HEADER_HEIGHT + 1, x / 2 - MAIN_PANEL_WIDTH - 1);
 	 	box(strength, 0, 0);
 	 	wattron(strength, WA_BOLD);
 	 	mvwprintw(strength, 0, 2, "Network Strength");
@@ -128,7 +119,7 @@ void makePanels(int y, int x) {
 	 	wrefresh(strength);
 	 
 	 	// speed panel
-	 	speed = newwin(mainHeight, x / 2 - 1, HEADER_HEIGHT + 1, x / 2 + 1);
+	 	speed = newwin(MAIN_HEIGHT, MAIN_PANEL_WIDTH, HEADER_HEIGHT + 1, x / 2 + 1);
 	 	box(speed, 0, 0);
 	 	wattron(speed, WA_BOLD);
 	 	mvwprintw(speed, 0, 2, "Network Speed");
