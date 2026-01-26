@@ -139,7 +139,7 @@ void makePanels(int y, int x) {
 	 	footer = newwin(FOOTER_HEIGHT, x, y - FOOTER_HEIGHT - 1, 0);
 	 	box(footer, 0, 0);
 
-		Footer footerPrinter(footer);
+		Footer footerPrinter(footer, FOOTER_HEIGHT, x);
 		footerPrinter.makeFooter();
 	 	
 	}

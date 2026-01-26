@@ -11,9 +11,13 @@ struct FooterItem {
 class Footer {
 	public:
 	WINDOW* footer;
+	int height;
+	int width;
 	
-	Footer(WINDOW* footer) {
+	Footer(WINDOW* footer, int y, int x) {
 		this->footer = footer;	
+		height = y;
+		width = x;
 	}
 	
 	void makeFooter() {
@@ -21,10 +25,10 @@ class Footer {
 		printRow(controls, 1, 1);
 
 		// jitter
-		printRow(jitter, 1, 50);
+		printRow(jitter, 1, width - 2 - 36); // right justified
 
 		// speed
-		printRow(speed, 2, 50);
+		printRow(speed, 2, width - 2 - 36); // right justified
 
 		wrefresh(footer);
 	}
