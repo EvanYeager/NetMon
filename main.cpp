@@ -1,7 +1,15 @@
 #include <ncurses.h>
 
 #include <iostream>
-#include "footer.cpp"
+#include "panel.h"
+#include <array>
+
+struct PanelStruct {
+    WINDOW* window;
+	PanelPrinter* panel;
+	int y;
+	int x;
+};
 
 <<<<<<< HEAD
 const int HEADER_HEIGHT = 4;
@@ -16,59 +24,23 @@ class NetMon {
 	const int FOOTER_HEIGHT = 6;
 >>>>>>> 75210fc (add dynamic main panel height)
 
-WINDOW* header;
-WINDOW* strength;
-WINDOW* speed;
-WINDOW* footer;
+	// WINDOW* header;
+	// WINDOW* strength;
+	// WINDOW* speed;
+	// WINDOW* footer;
+	std::array<PanelStruct, 4> panels {};
 
 bool paused = false;
 
-void initColors() {
-	start_color();
-	init_pair(1, COLOR_GREEN, COLOR_BLACK);		// good
-	init_pair(2, COLOR_YELLOW, COLOR_BLACK);	// warning
-	init_pair(3, COLOR_RED, COLOR_BLACK);		// critical
-	init_pair(4, COLOR_CYAN, COLOR_BLACK);		// header
-	init_pair(5, COLOR_WHITE, COLOR_BLACK);		// title bar
-}
+	public:
+	void run() {
 
-void makePanels(int y, int x) {
-	// header
-	header = newwin(HEADER_HEIGHT, x, 0, 0);
-	wbkgd(header, COLOR_PAIR(5));
-	box(header, 0, 0);
-	wattron(header, WA_BOLD | WA_UNDERLINE);
-	mvwprintw(header, 1, (x - 25) /2, "NETWORK STRENGTH MONITOR");
-	wattroff(header, WA_BOLD | WA_UNDERLINE);
-	wrefresh(header);
+		initscr();			/* Start curses mode 		*/
+		raw();				/* Line buffering disabled	*/
+		keypad(stdscr, TRUE);		/* We get F1, F2 etc..		*/
+		noecho();			/* Don't echo() while we do getch */
+		curs_set(0);
 
-<<<<<<< HEAD
-	// strength panel
- 	strength = newwin(MAIN_HEIGHT, MAIN_PANEL_MIN_WIDTH, HEADER_HEIGHT + 1, 0);
- 	box(strength, 0, 0);
- 	wattron(strength, WA_BOLD);
- 	mvwprintw(strength, 0, 2, "Network Strength");
- 	wattroff(strength, WA_BOLD);
- 	wrefresh(strength);
- 
- 	// speed panel
- 	speed = newwin(MAIN_HEIGHT, MAIN_PANEL_MIN_WIDTH, HEADER_HEIGHT + 1, MAIN_PANEL_MIN_WIDTH + 3);
- 	box(speed, 0, 0);
- 	wattron(speed, WA_BOLD);
- 	mvwprintw(speed, 0, 2, "Network Speed");
- 	wattroff(speed, WA_BOLD);
- 	wrefresh(speed);	
- 
- 	// footer
- 	footer = newwin(FOOTER_HEIGHT, x, y - FOOTER_HEIGHT - 1, 0);
- 	box(footer, 0, 0);
- 	wattron(footer, WA_BOLD | WA_UNDERLINE);
- 	// mvwprintw(footer, 1, (x - 8) / 2, "CONTROLS");''
- 	wattroff(footer, WA_UNDERLINE);
- 	mvwprintw(footer, 1, 2, "Controls: [Q]uit | [R]efresh | [P]ause");
- 	wattroff(footer, WA_BOLD);
- 	wrefresh(footer); 
-=======
 		initColors();
 
 		refresh();
@@ -76,9 +48,7 @@ void makePanels(int y, int x) {
 		int y, x;
 		getmaxyx(stdscr, y, x);		/* get the number of rows and columns */
 
-
 		makePanels(y, x);
-		
 
 		while (true) {
 			int ch = getch();
@@ -91,10 +61,10 @@ void makePanels(int y, int x) {
 			}
 		}
 
-	   	delwin(header);
-	   	delwin(strength);
-	   	delwin(speed);
-	   	delwin(footer);
+		for (auto& panel : panels) {
+		    delwin(panel.window);
+			delete panel.panel;
+		}
 		endwin();			/* End curses mode		  */
 
 	}
@@ -102,37 +72,30 @@ void makePanels(int y, int x) {
 
 	void makePanels(int y, int x) {
 		// header
-		header = newwin(HEADER_HEIGHT, x, 0, 0);
-		wbkgd(header, COLOR_PAIR(5));
-		box(header, 0, 0);
-		wattron(header, WA_BOLD | WA_UNDERLINE);
-		mvwprintw(header, 1, (x - 25) /2, "NETWORK STRENGTH MONITOR");
-		wattroff(header, WA_BOLD | WA_UNDERLINE);
-		wrefresh(header);
+		WINDOW* headerWin = newwin(HEADER_HEIGHT, x, 0, 0);
+		PanelPrinter* headerPtr = new Header();
 
 		// strength panel
-	 	strength = newwin(MAIN_HEIGHT, MAIN_PANEL_WIDTH, HEADER_HEIGHT + 1, x / 2 - MAIN_PANEL_WIDTH - 1);
-	 	box(strength, 0, 0);
-	 	wattron(strength, WA_BOLD);
-	 	mvwprintw(strength, 0, 2, "Network Strength");
-	 	wattroff(strength, WA_BOLD);
-	 	wrefresh(strength);
-	 
-	 	// speed panel
-	 	speed = newwin(MAIN_HEIGHT, MAIN_PANEL_WIDTH, HEADER_HEIGHT + 1, x / 2 + 1);
-	 	box(speed, 0, 0);
-	 	wattron(speed, WA_BOLD);
-	 	mvwprintw(speed, 0, 2, "Network Speed");
-	 	wattroff(speed, WA_BOLD);
-	 	wrefresh(speed);	
-	 
-	 	// footer
-	 	footer = newwin(FOOTER_HEIGHT, x, y - FOOTER_HEIGHT - 1, 0);
-	 	box(footer, 0, 0);
+	 	WINDOW* strengthWin = newwin(MAIN_HEIGHT, MAIN_PANEL_WIDTH, HEADER_HEIGHT + 1, x / 2 - MAIN_PANEL_WIDTH - 1);
+		PanelPrinter* strengthPanelPtr = new StrPanel;
 
-		Footer footerPrinter(footer, FOOTER_HEIGHT, x);
-		footerPrinter.makeFooter();
-	 	
+	 	// speed panel
+	 	WINDOW* speedWin = newwin(MAIN_HEIGHT, MAIN_PANEL_WIDTH, HEADER_HEIGHT + 1, x / 2 + 1);
+	    PanelPrinter* speedPanelPtr = new SpdPanel;
+
+	 	// footer
+	 	WINDOW* footerWin = newwin(FOOTER_HEIGHT, x, y - FOOTER_HEIGHT - 1, 0);
+		PanelPrinter* footerPtr = new Footer;
+
+	    panels[0] = { headerWin, headerPtr, HEADER_HEIGHT, x };
+		panels[1] = { strengthWin, strengthPanelPtr, MAIN_HEIGHT, MAIN_PANEL_WIDTH };
+		panels[2] = { speedWin, speedPanelPtr, MAIN_HEIGHT, MAIN_PANEL_WIDTH };
+		panels[3] = { footerWin, footerPtr, FOOTER_HEIGHT, x };
+
+		for (auto& panel : panels) {
+		    panel.panel->printText(panel.window, panel.y, panel.x);
+		}
+
 	}
 
 	void initColors() {
@@ -150,48 +113,4 @@ int main() {
 	NetMon monitor;
 	monitor.run();
 	return 0;
->>>>>>> 75210fc (add dynamic main panel height)
 }
-
-
-int main() {
-
-	// int ch;
-
-	initscr();			/* Start curses mode 		*/
-	raw();				/* Line buffering disabled	*/
-	keypad(stdscr, TRUE);		/* We get F1, F2 etc..		*/
-	noecho();			/* Don't echo() while we do getch */
-	curs_set(0);
-
-	initColors();
-
-	refresh();
-
-	int y, x;
-	getmaxyx(stdscr, y, x);		/* get the number of rows and columns */
-
-
-	makePanels(y, x);
-	
-
-	while (true) {
-		int ch = getch();
-
-		if (ch == 'q' || ch == 'Q') {
-			break;
-		}
-		if (ch == 'p' || ch == 'P') {
-			paused = !paused;
-		}
-	}
-
-   	delwin(header);
-   	delwin(strength);
-   	delwin(speed);
-   	delwin(footer);
-	endwin();			/* End curses mode		  */
-
-	return 0;
-}
-
