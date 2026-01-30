@@ -10,6 +10,6 @@ public:
 
 protected:
 	WINDOW* window;
-	int y;
-	int x;	
+	int height;
+	int width;	
 };
