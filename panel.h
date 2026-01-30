@@ -6,17 +6,17 @@
 
 class Header : public PanelPrinter {
 public:
-    void printText(WINDOW* window, int height, int width) override;
+    void print(WINDOW* window, int height, int width) override;
 };
 
 class SpdPanel : public PanelPrinter {
 public:
-    void printText(WINDOW* window, int height, int width) override;
+    void print(WINDOW* window, int height, int width) override;
 };
 
 class StrPanel : public PanelPrinter {
 public:
-    void printText(WINDOW* window, int height, int width) override;
+    void print(WINDOW* window, int height, int width) override;
 };
 
 struct FooterItem {
@@ -27,8 +27,8 @@ struct FooterItem {
 
 class Footer : public PanelPrinter {
 public:
-    Footer();
-	void printText(WINDOW* window, int height, int width) override;
+  Footer();
+	void print(WINDOW* window, int height, int width) override;
 
 private:
 	template <typename T, std::size_t N>

@@ -24,10 +24,6 @@ class NetMon {
 	const int FOOTER_HEIGHT = 6;
 >>>>>>> 75210fc (add dynamic main panel height)
 
-	// WINDOW* header;
-	// WINDOW* strength;
-	// WINDOW* speed;
-	// WINDOW* footer;
 	std::array<PanelStruct, 4> panels {};
 
 bool paused = false;
@@ -93,7 +89,7 @@ bool paused = false;
 		panels[3] = { footerWin, footerPtr, FOOTER_HEIGHT, x };
 
 		for (auto& panel : panels) {
-		    panel.panel->printText(panel.window, panel.y, panel.x);
+		    panel.panel->print(panel.window, panel.y, panel.x);
 		}
 
 	}

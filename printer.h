@@ -5,8 +5,7 @@ class PanelPrinter {
 public:
 	PanelPrinter();
 
-	// populate text in the panel
-	virtual void printText(WINDOW* window, int height, int width);
+	virtual void print(WINDOW* window, int height, int width);
 
 
 protected:

@@ -1,7 +1,7 @@
 #include "panel.h"
 
-void Header::printText(WINDOW* window, int height, int width) {
-    PanelPrinter::printText(window, height, width);
+void Header::print(WINDOW* window, int height, int width) {
+    PanelPrinter::print(window, height, width);
 
     wbkgd(window, COLOR_PAIR(5));
 	box(window, 0, 0);
@@ -11,8 +11,8 @@ void Header::printText(WINDOW* window, int height, int width) {
 	wrefresh(window);
 }
 
-void SpdPanel::printText(WINDOW* window, int height, int width) {
-    PanelPrinter::printText(window, height, width);
+void SpdPanel::print(WINDOW* window, int height, int width) {
+    PanelPrinter::print(window, height, width);
 
     box(window, 0, 0);
  	wattron(window, WA_BOLD);
@@ -21,8 +21,8 @@ void SpdPanel::printText(WINDOW* window, int height, int width) {
  	wrefresh(window);
 }
 
-void StrPanel::printText(WINDOW* window, int height, int width) {
-    PanelPrinter::printText(window, height, width);
+void StrPanel::print(WINDOW* window, int height, int width) {
+    PanelPrinter::print(window, height, width);
 
 	box(window, 0, 0);
    	wattron(window, WA_BOLD);
@@ -55,8 +55,8 @@ Footer::Footer() {
 	};
 }
 
-void Footer::printText(WINDOW* window, int height, int width) {
-	PanelPrinter::printText(window, height, width);
+void Footer::print(WINDOW* window, int height, int width) {
+	PanelPrinter::print(window, height, width);
 
 	box(window, 0, 0);
 
