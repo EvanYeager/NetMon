@@ -11,18 +11,11 @@ struct PanelStruct {
 	int x;
 };
 
-<<<<<<< HEAD
-const int HEADER_HEIGHT = 4;
-const int MAIN_HEIGHT = 7;
-const int MAIN_PANEL_MIN_WIDTH = 30;
-const int FOOTER_HEIGHT = 6;
-=======
 class NetMon {
 	const int HEADER_HEIGHT = 4;
 	const int MAIN_HEIGHT = 11;
 	const int MAIN_PANEL_WIDTH = 40;
 	const int FOOTER_HEIGHT = 6;
->>>>>>> 75210fc (add dynamic main panel height)
 
 	std::array<PanelStruct, 4> panels {};
 
