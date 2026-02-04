@@ -1,5 +1,6 @@
 #include "panel.h"
 #include "bar.h"
+#include <unistd.h>
 
 void Header::print(WINDOW* window, int height, int width) {
     PanelPrinter::print(window, height, width);
