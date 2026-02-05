@@ -3,13 +3,12 @@
 
 class PanelPrinter {
 public:
-	PanelPrinter();
+  PanelPrinter();
 
-	virtual void print(WINDOW* window, int height, int width);
-
+  virtual void print(WINDOW *window, int height, int width);
 
 protected:
-	WINDOW* window;
-	int height;
-	int width;	
+  WINDOW *window;
+  int height;
+  int width;
 };
