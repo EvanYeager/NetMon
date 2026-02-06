@@ -3,6 +3,8 @@
 #include "panel.h"
 #include <array>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 struct PanelStruct {
   WINDOW* window;
@@ -20,6 +22,18 @@ class NetMon {
   std::array<PanelStruct, 4> panels{};
 
   bool paused = false;
+
+  // start a new thread to refresh panels with new data (if available)
+  std::thread refreshThr = std::thread([] {
+    while (!paused) {
+      std::this_thread::sleep_for(3000);
+      if (!paused) {
+        panels[1].panel.print(panels[1].window, MAIN_HEIGHT, MAIN_PANEL_WIDTH); // strength panel
+        panels[2].panel.print(panels[2].window, MAIN_HEIGHT, MAIN_PANEL_WIDTH); // speed panel
+        std::cout << "thread running\n";
+      }
+    }
+  });
 
 public:
   void run() {
