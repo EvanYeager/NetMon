@@ -5,6 +5,9 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <atomic>
+#include <mutex>
+#include <condition_variable>
 
 struct PanelStruct {
   WINDOW* window;
@@ -21,19 +24,11 @@ class NetMon {
 
   std::array<PanelStruct, 4> panels{};
 
-  bool paused = false;
-
-  // start a new thread to refresh panels with new data (if available)
-  std::thread refreshThr = std::thread([] {
-    while (!paused) {
-      std::this_thread::sleep_for(3000);
-      if (!paused) {
-        panels[1].panel.print(panels[1].window, MAIN_HEIGHT, MAIN_PANEL_WIDTH); // strength panel
-        panels[2].panel.print(panels[2].window, MAIN_HEIGHT, MAIN_PANEL_WIDTH); // speed panel
-        std::cout << "thread running\n";
-      }
-    }
-  });
+  std::atomic<bool> paused { false };
+  std::atomic<bool> shouldStop { false };
+  std::condition_variable cv;
+  std::mutex cvMutex;
+  std::thread refreshThrd;
 
 public:
   void run() {
@@ -53,6 +48,21 @@ public:
 
     makePanels(y, x);
 
+    // start a new thread to refresh panels with new data (if available)
+    refreshThrd = std::thread([this] {
+      while (!shouldStop) {
+        std::unique_lock<std::mutex> lock(cvMutex);
+        cv.wait_for(lock, std::chrono::milliseconds(2000), [this] {
+          return shouldStop.load();
+        });
+        
+        if (!paused && !shouldStop) {
+          panels[1].panel->print(panels[1].window, MAIN_HEIGHT, MAIN_PANEL_WIDTH); // strength panel
+          panels[2].panel->print(panels[2].window, MAIN_HEIGHT, MAIN_PANEL_WIDTH); // speed panel
+        }
+      }
+    });
+
     while (true) {
       int ch = getch();
 
@@ -62,6 +72,12 @@ public:
       if (ch == 'p' || ch == 'P') {
         paused = !paused;
       }
+    }
+
+    shouldStop = true; // tell thread to stop
+    cv.notify_all(); // wake up the thread
+    if (refreshThrd.joinable()) {
+      refreshThrd.join(); // wait for thread to finish
     }
 
     for (auto &panel : panels) {
