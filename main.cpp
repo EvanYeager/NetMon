@@ -1,6 +1,7 @@
 #include <ncurses.h>
 
 #include "panel.h"
+#include "netstats.h"
 #include <array>
 #include <iostream>
 #include <thread>
