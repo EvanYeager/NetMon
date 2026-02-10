@@ -1,5 +1,6 @@
 #include "bar.h"
 #include "panel.h"
+#include "netstats.h"
 #include <unistd.h>
 
 void Header::print(WINDOW *window, int height, int width) {

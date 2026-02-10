@@ -2,16 +2,8 @@
 #include <iostream>
 #include <ncurses.h>
 
-Bar::Bar(int y, int x, float value, float max, std::string label, int min) {
-  this->y = y;
-  this->x = x;
-  this->value = value;
-  this->max = max;
-  this->label = label;
-  this->min = min;
-}
-
-void Bar::setBarValue(int value) { this->value = value; }
+Bar::Bar(int y, int x, const float& trackedValue, float max, std::string label, int min)
+  : y(y), x(x), value(trackedValue), max(max), label(label), min(min) {}
 
 void Bar::print(WINDOW *window, int height, int width) {
   PanelPrinter::print(window, height, width);

@@ -20,7 +20,7 @@ namespace netstats {
     return stats;
   }
   
-  inline float getPacketLoss() { return getStats().packetLoss; }
+  inline const float& getPacketLoss() { return getStats().packetLoss; }
   inline std::chrono::milliseconds getLatency() { return getStats().latency; }
   inline std::chrono::milliseconds getJitter() { return getStats().jitter; }
   inline Mbps getDownloadSpeed() { return getStats().downloadSpeed; }
