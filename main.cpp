@@ -1,5 +1,4 @@
 #include <ncurses.h>
-
 #include "panel.h"
 #include "netstats.h"
 #include <array>
@@ -9,6 +8,7 @@
 #include <atomic>
 #include <mutex>
 #include <condition_variable>
+#include "netdiag.h"
 
 struct PanelStruct {
   WINDOW* window;
@@ -63,6 +63,9 @@ public:
         }
       }
     });
+
+    NetDiag net;
+    net.runPacketLoss();
 
     while (true) {
       int ch = getch();
