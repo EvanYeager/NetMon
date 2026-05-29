@@ -1,3 +1,4 @@
+#include <fstream>
 #include <ncurses.h>
 #include "panel.h"
 #include "netstats.h"
@@ -58,6 +59,7 @@ public:
         });
         
         if (!paused && !shouldStop) {
+          netstats::updateStats();
           panels[1].panel->print(panels[1].window, MAIN_HEIGHT, MAIN_PANEL_WIDTH); // strength panel
           panels[2].panel->print(panels[2].window, MAIN_HEIGHT, MAIN_PANEL_WIDTH); // speed panel
         }
@@ -88,6 +90,14 @@ public:
       delwin(panel.window);
       delete panel.panel;
     }
+
+    // log stats to file; optional
+    std::ofstream stats("netstats.txt");
+    stats << "avg latency: " << netstats::getStats().latency << "\n";
+    stats << "sent packets: " << netstats::getStats().sentPackets << "\n";
+    stats << "% lost packets: " << netstats::getStats().lostPacketPcnt << "\n";
+    stats << "jitter: " << netstats::getStats().jitter << "\n";
+    
     endwin(); /* End curses mode		  */
   }
 

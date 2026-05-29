@@ -1,0 +1,4 @@
+avg latency: 41.0922
+sent packets: 106
+% lost packets: 0
+jitter: 1.95393

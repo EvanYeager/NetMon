@@ -1,21 +1,26 @@
 #include "bar.h"
-#include <iostream>
+#include <cmath>
 #include <ncurses.h>
 
-Bar::Bar(int y, int x, const float& trackedValue, float max, std::string label, int min)
-  : y(y), x(x), value(trackedValue), max(max), label(label), min(min) {}
+Bar::Bar(int y, int x, const float &trackedValue, const Scale *scale,
+         std::string label)
+    : y(y), x(x), value(trackedValue), scale(scale), label(label) {}
 
 void Bar::print(WINDOW *window, int height, int width) {
   PanelPrinter::print(window, height, width);
 
-  float percent = (value - min) / (float)max;
+  float percent = scale->normalize(value);
+  // float percent = (scaledValue - min) / (float)max;
   int filledWidth = (int)(percent * width);
 
+  int color = percent * 100.0f < 30 ? 1 : percent * 100.0f < 70 ? 2 : 3;
+
   // printing bar
-  wattron(window, COLOR_PAIR(1));
-  mvwhline(window, y, x, ACS_CKBOARD, filledWidth);
-  wattroff(window, COLOR_PAIR(1));
-  mvwhline(window, y, x + filledWidth, '-', width - filledWidth);
+  wattron(window, COLOR_PAIR(color));
+  mvwhline(window, y, x, ACS_CKBOARD, filledWidth); // filled portion
+  wattroff(window, COLOR_PAIR(color));
+  mvwhline(window, y, x + filledWidth, '-',
+           width - filledWidth); // unfilled portion
 
   // print the text to the right of the bar
   if (showValue && !label.empty()) { // showing the value and label

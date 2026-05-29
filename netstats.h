@@ -1,5 +1,7 @@
+#pragma once
+
 #include <ncurses.h>
-#include <chrono>
+#include <vector>
 
 struct Mbps {
   float value;
@@ -7,28 +9,37 @@ struct Mbps {
 };
 
 struct Stats {
-  float packetLoss = 0.0f;     // percent
-  std::chrono::milliseconds latency {0};        // ms
-  std::chrono::milliseconds jitter {0};         // ms
-  Mbps downloadSpeed {0.0f};  // mbps
-  Mbps uploadSpeed {0.0f};    // mbps
+  Mbps downloadSpeed {0.0f};
+  Mbps uploadSpeed {0.0f};
+  float latency = 0.0f;
+  float jitter = 0.0f;
+  int sentPackets = 0;
+  float lostPacketPcnt = 0.0f;
 };
 
-namespace netstats {
-  inline Stats& getStats() {
+class netstats {
+public:
+  static void updateStats();
+
+  static Stats& getStats() {
     static Stats stats{};
     return stats;
   }
-  
-  inline const float& getPacketLoss() { return getStats().packetLoss; }
-  inline std::chrono::milliseconds getLatency() { return getStats().latency; }
-  inline std::chrono::milliseconds getJitter() { return getStats().jitter; }
-  inline Mbps getDownloadSpeed() { return getStats().downloadSpeed; }
-  inline Mbps getUploadSpeed() { return getStats().uploadSpeed; }
 
-  inline void setPacketLoss(float value) { getStats().packetLoss = value; }
-  inline void setLatency(std::chrono::milliseconds value) { getStats().latency = value; }
-  inline void setJitter(std::chrono::milliseconds value) { getStats().jitter = value; }
-  inline void setDownloadSpeed(Mbps value) { getStats().downloadSpeed = value; }
-  inline void setUploadSpeed(Mbps value) { getStats().uploadSpeed = value; }
+  static void addLatency(float lt) { latencies.push_back(lt); }
+  static void addSentPacket()      { getStats().sentPackets++; }
+  static void addLostPacket()      { lostPackets++; }
+
+private:
+  inline static std::vector<float> latencies;
+  inline static int lostPackets;
+
+  static void calcPktLoss();
+  static void calcUpSpd();
+  static void calcDownSpd();
+  static void calcJitter();
+  static void calcLatency();
+
+  static void setDownloadSpeed(Mbps value) { getStats().downloadSpeed = value; }
+  static void setUploadSpeed(Mbps value)   { getStats().uploadSpeed = value; }
 };
