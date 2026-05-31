@@ -33,7 +33,7 @@ class NetMon {
   std::thread refreshThrd;
 
 public:
-  void run() {
+  void run(int argc, char* argv[]) {
 
     initscr();            /* Start curses mode 		*/
     raw();                /* Line buffering disabled	*/
@@ -91,12 +91,17 @@ public:
       delete panel.panel;
     }
 
-    // log stats to file; optional
-    std::ofstream stats("netstats.txt");
-    stats << "avg latency: " << netstats::getStats().latency << "\n";
-    stats << "sent packets: " << netstats::getStats().sentPackets << "\n";
-    stats << "% lost packets: " << netstats::getStats().lostPacketPcnt << "\n";
-    stats << "jitter: " << netstats::getStats().jitter << "\n";
+    // log stats to file if flag is present
+    if (argc > 1) {
+      std::string arg = argv[1];
+      if (arg == "--log") {
+        std::ofstream stats("netmonlog.txt");
+        stats << "avg latency: " << netstats::getStats().latency << "\n";
+        stats << "sent packets: " << netstats::getStats().sentPackets << "\n";
+        stats << "% lost packets: " << netstats::getStats().lostPacketPcnt << "\n";
+        stats << "jitter: " << netstats::getStats().jitter << "\n";
+      }
+    }
     
     endwin(); /* End curses mode		  */
   }
@@ -141,8 +146,8 @@ public:
   }
 };
 
-int main() {
+int main(int argc, char* argv[]) {
   NetMon monitor;
-  monitor.run();
+  monitor.run(argc, argv);
   return 0;
 }
