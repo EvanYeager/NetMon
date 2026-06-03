@@ -7,5 +7,6 @@
 class NetDiag {
 public:
   void runPacketLoss();
+  void runSpeedTest();
 
 };

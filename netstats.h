@@ -26,13 +26,17 @@ public:
     return stats;
   }
 
-  static void addLatency(float lt) { latencies.push_back(lt); }
-  static void addSentPacket()      { getStats().sentPackets++; }
-  static void addLostPacket()      { lostPackets++; }
+  static void addLatency(float lt)       { latencies.push_back(lt); }
+  static void addSentPacket()            { getStats().sentPackets++; }
+  static void addLostPacket()            { lostPackets++; }
+  static void addDownloadTime(Mbps dt)   { downloadSpeeds.push_back(dt); }
+  static void addUploadTime(Mbps ut)     { uploadSpeeds.push_back(ut); }
 
 private:
   inline static std::vector<float> latencies;
   inline static int lostPackets;
+  inline static std::vector<Mbps> downloadSpeeds;
+  inline static std::vector<Mbps> uploadSpeeds;
 
   static void calcPktLoss();
   static void calcUpSpd();

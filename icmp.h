@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <chrono>
 #include <netinet/in.h>
+#include <thread>
 
 struct ICMPHeader {
   uint8_t type;     // 8 = echo request, 0 = echo reply
@@ -12,8 +13,11 @@ struct ICMPHeader {
 
 class ICMP {
 public:
-  // uint16_t checksum(void* data, int len);
-  // double ping(int sock, const sockaddr_in& dest, uint16_t seq);
   void startPings();
+  void stopPings();
+
+private:
+  std::jthread worker;
+  void ping();
 };
 

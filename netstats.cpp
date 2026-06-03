@@ -17,11 +17,21 @@ void netstats::calcPktLoss() {
 }
 
 void netstats::calcUpSpd() {
-  
+  if (uploadSpeeds.size() == 0) return;
+  float total = 0.0f;
+  for (int i = 0; i < uploadSpeeds.size(); i++) {
+    total += uploadSpeeds.at(i).value;
+  }
+  getStats().uploadSpeed = Mbps(total / uploadSpeeds.size());
 }
 
 void netstats::calcDownSpd() {
-  
+  if (downloadSpeeds.size() == 0) return;
+  float total = 0.0f;
+  for (int i = 0; i < downloadSpeeds.size(); i++) {
+    total += downloadSpeeds.at(i).value;
+  }
+  getStats().downloadSpeed = Mbps(total / downloadSpeeds.size());
 }
 
 void netstats::calcLatency() {

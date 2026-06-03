@@ -25,7 +25,6 @@ void StrPanel::print(WINDOW *window, int height, int width) {
   lossBar.print(window, 1, 20);
 
   // jitter bar
-  // const LinearScale* jitterScale = new LinearScale(50);
   const LogScale* jitterScale = new LogScale(50, 5.0f);
   Bar jitterBar(3, 1, netstats::getStats().jitter, jitterScale, "jitter, ms");
   jitterBar.setShowValue(true);
@@ -41,9 +40,22 @@ void StrPanel::print(WINDOW *window, int height, int width) {
 void SpdPanel::print(WINDOW *window, int height, int width) {
   PanelPrinter::print(window, height, width);
 
+  // down speed bar
+  const LogScale* speedScale = new LogScale(1000.0f, 30.0f);
+  Bar downSpdBar(1, 1, netstats::getStats().downloadSpeed.value, speedScale, "download, Mbps");
+  downSpdBar.setShowValue(true);
+  downSpdBar.setColorDirection(colorDirection::reversed);
+  downSpdBar.print(window, 1, 20);
+
+  // upload speed bar
+  Bar upSpdBar(3, 1, netstats::getStats().uploadSpeed.value, speedScale, "upload, Mbps");
+  upSpdBar.setShowValue(true);
+  upSpdBar.setColorDirection(colorDirection::reversed);
+  upSpdBar.print(window, 1, 20);
+
   // latency bar
   const LogScale* latencyScale = new LogScale(300.0f, 5.0f);
-  Bar latencyBar(1, 1, netstats::getStats().latency, latencyScale, "latency, ms"); 
+  Bar latencyBar(5, 1, netstats::getStats().latency, latencyScale, "latency, ms"); 
   latencyBar.setShowValue(true);
   latencyBar.print(window, 1, 20);
 

@@ -11,6 +11,11 @@ struct Colors {
   int high = 3;
 };
 
+enum colorDirection {
+  normal,  // lower on the bar is better
+  reversed // higher on the bar is better
+};
+
 struct Bounds {
   float low = 20.0f;
   float high = 70.0f;
@@ -59,6 +64,7 @@ private:
   std::string label;
   bool showValue = true;
   const Scale* scale;
+  colorDirection direction = colorDirection::normal;
 
 public:
   Bar(int y, int x, const float& trackedValue, const Scale* scale, std::string label = "");
@@ -67,4 +73,5 @@ public:
 
   void setLabel(std::string label);
   void setShowValue(bool show);
+  void setColorDirection(colorDirection direction);
 };

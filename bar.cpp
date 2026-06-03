@@ -13,7 +13,13 @@ void Bar::print(WINDOW *window, int height, int width) {
   // float percent = (scaledValue - min) / (float)max;
   int filledWidth = (int)(percent * width);
 
-  int color = percent * 100.0f < 30 ? 1 : percent * 100.0f < 70 ? 2 : 3;
+  int color;
+  if (direction == colorDirection::normal) {
+    color = percent * 100.0f < 30 ? 1 : percent * 100.0f < 70 ? 2 : 3;  
+  }
+  else {
+    color = percent * 100.0f < 30 ? 3 : percent * 100.0f < 70 ? 2 : 1;
+  }
 
   // printing bar
   wattron(window, COLOR_PAIR(color));
@@ -37,3 +43,5 @@ void Bar::print(WINDOW *window, int height, int width) {
 void Bar::setLabel(std::string label) { this->label = label; }
 
 void Bar::setShowValue(bool show) { this->showValue = show; }
+
+void Bar::setColorDirection(colorDirection direction) { this->direction = direction; }

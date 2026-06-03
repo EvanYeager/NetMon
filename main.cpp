@@ -18,6 +18,17 @@ struct PanelStruct {
   int x;
 };
 
+void packetLossTest() {
+  NetDiag net;
+  net.runPacketLoss();
+}
+
+void speedTest() {
+  NetDiag net;
+  net.runSpeedTest();  
+}
+
+
 class NetMon {
   const int HEADER_HEIGHT = 4;
   const int MAIN_HEIGHT = 11;
@@ -66,8 +77,8 @@ public:
       }
     });
 
-    NetDiag net;
-    net.runPacketLoss();
+    std::thread pcktLossThr(packetLossTest);
+    std::thread spdTestThr(speedTest);
 
     while (true) {
       int ch = getch();
@@ -82,8 +93,12 @@ public:
 
     shouldStop = true; // tell thread to stop
     cv.notify_all(); // wake up the thread
+
+    // join all threads
     if (refreshThrd.joinable()) {
-      refreshThrd.join(); // wait for thread to finish
+      refreshThrd.join();
+      pcktLossThr.join();
+      spdTestThr.join();
     }
 
     for (auto &panel : panels) {
@@ -100,6 +115,7 @@ public:
         stats << "sent packets: " << netstats::getStats().sentPackets << "\n";
         stats << "% lost packets: " << netstats::getStats().lostPacketPcnt << "\n";
         stats << "jitter: " << netstats::getStats().jitter << "\n";
+        stats << "download speed: " << netstats::getStats().downloadSpeed.value << "mbps\n";
       }
     }
     
