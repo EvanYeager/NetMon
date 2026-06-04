@@ -19,18 +19,25 @@ struct PanelStruct {
   int x;
 };
 
+  std::atomic<bool> shouldStop{false};
+  std::condition_variable cv;
+  std::mutex cvMutex;
+  std::thread refreshThrd;
+
 void networkTest() {
   // speed test (both at once)
-  std::thread downThrd([]() { SpeedTester::downloadTest(); });
-  std::thread upThrd([]() { SpeedTester::uploadTest(); });
+  std::thread downThrd([]() { SpeedTester::downloadTest(shouldStop); });
+  std::thread upThrd([]() { SpeedTester::uploadTest(shouldStop); });
 
   // wait to finish before doing other tests
   downThrd.join();
   upThrd.join();
 
+  if (shouldStop) return;
   ICMP icmp;
-  icmp.startPings();
+  icmp.startPings(shouldStop);
 }
+  
 
 class NetMon {
   const int HEADER_HEIGHT = 4;
@@ -40,12 +47,9 @@ class NetMon {
 
   std::array<PanelStruct, 4> panels{};
 
-  std::atomic<bool> shouldStop{false};
-  std::condition_variable cv;
-  std::mutex cvMutex;
-  std::thread refreshThrd;
 
 public:
+
   void run(int argc, char *argv[]) {
 
     initscr();            /* Start curses mode 		*/

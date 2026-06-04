@@ -2,6 +2,7 @@
 #include <chrono>
 #include <netinet/in.h>
 #include <thread>
+#include <atomic>
 
 struct ICMPHeader {
   uint8_t type;     // 8 = echo request, 0 = echo reply
@@ -13,11 +14,7 @@ struct ICMPHeader {
 
 class ICMP {
 public:
-  void startPings();
-  void stopPings();
+  void startPings(std::atomic<bool>& quitFlag);
 
-private:
-  std::jthread worker;
-  void ping();
 };
 

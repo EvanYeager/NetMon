@@ -6,12 +6,9 @@
 #include <netinet/in.h>
 #include <string>
 #include <unistd.h>
+#include <atomic>
 
-void ICMP::startPings() {
-  worker = std::jthread([this] { ping(); });
-}
-
-void ICMP::ping() {  
+void ICMP::startPings(std::atomic<bool>& quitFlag) {  
   std::array<char, 128> buffer;
   std::string result;
 
@@ -26,6 +23,8 @@ void ICMP::ping() {
   int lastSeq = 0;
   while (fgets(buffer.data(), static_cast<int>(buffer.size()), pipe.get()) !=
          nullptr) {
+    if (quitFlag) return;
+
     netstats::addSentPacket();
     std::string line = buffer.data();
     size_t start = line.find("time=");
@@ -57,6 +56,3 @@ void ICMP::ping() {
   }
 }
 
-void ICMP::stopPings() {
-  worker.detach();
-}

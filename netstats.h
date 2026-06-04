@@ -44,6 +44,4 @@ private:
   static void calcJitter();
   static void calcLatency();
 
-  static void setDownloadSpeed(Mbps value) { getStats().downloadSpeed = value; }
-  static void setUploadSpeed(Mbps value)   { getStats().uploadSpeed = value; }
 };

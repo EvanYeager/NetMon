@@ -6,11 +6,12 @@
 #include <curl/easy.h>
 #include <iostream>
 #include <string>
+#include <atomic>
 
 const int DOWN_BYTES_SENT = 10'000'000;
 const int UP_BYTES_SENT = 1'000'000;
 
-void SpeedTester::downloadTest() {
+void SpeedTester::downloadTest(std::atomic<bool>& quitFlag) {
   std::string url = "https://speed.cloudflare.com/__down?bytes=" +
                     std::to_string(DOWN_BYTES_SENT);
 
@@ -35,6 +36,11 @@ void SpeedTester::downloadTest() {
       continue; // if error, don't count it towards the stats
     }
 
+    if (quitFlag) {
+      curl_easy_cleanup(curl);
+      return;
+    }
+
     auto end = std::chrono::steady_clock::now();
 
     float elapsed = std::chrono::duration<double>(end - start).count();
@@ -52,7 +58,7 @@ void SpeedTester::downloadTest() {
 
 }
 
-void SpeedTester::uploadTest() {
+void SpeedTester::uploadTest(std::atomic<bool>& quitFlag) {
   CURL *curl = curl_easy_init();
   if (!curl)
     return;
@@ -70,6 +76,12 @@ void SpeedTester::uploadTest() {
       +[](void *, size_t size, size_t nmemb, void *) { return size * nmemb; });
 
   for (int i = 0; i < 10; i++) {
+
+    if (quitFlag) {
+      curl_easy_cleanup(curl);
+      return;
+    }
+
     auto start = std::chrono::steady_clock::now();
     CURLcode resp = curl_easy_perform(curl);
     if (resp != CURLE_OK)
