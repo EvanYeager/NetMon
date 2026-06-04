@@ -35,7 +35,7 @@ void netstats::calcDownSpd() {
 }
 
 void netstats::calcLatency() {
-  
+  if (latencies.size() == 0) return;
   float sum = 0.0f;
   for (float lt : latencies) {
     sum += lt;
@@ -44,6 +44,7 @@ void netstats::calcLatency() {
 }
 
 void netstats::calcJitter() {
+  if (latencies.size() == 0) return;
   float differences = 0.0f;
   for (int i = 0; i < latencies.size() - 1; i += 2) {
     differences += std::abs(latencies.at(i) - latencies.at(i + 1));

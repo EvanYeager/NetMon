@@ -1,50 +1,52 @@
-#include <fstream>
-#include <ncurses.h>
-#include "panel.h"
+#include "icmp.h"
 #include "netstats.h"
+#include "panel.h"
+#include "speedtester.h"
 #include <array>
-#include <iostream>
-#include <thread>
-#include <chrono>
 #include <atomic>
-#include <mutex>
+#include <chrono>
 #include <condition_variable>
-#include "netdiag.h"
+#include <fstream>
+#include <iostream>
+#include <mutex>
+#include <ncurses.h>
+#include <thread>
 
 struct PanelStruct {
-  WINDOW* window;
-  PanelPrinter* panel;
+  WINDOW *window;
+  PanelPrinter *panel;
   int y;
   int x;
 };
 
-void packetLossTest() {
-  NetDiag net;
-  net.runPacketLoss();
-}
+void networkTest() {
+  // speed test (both at once)
+  std::thread downThrd([]() { SpeedTester::downloadTest(); });
+  std::thread upThrd([]() { SpeedTester::uploadTest(); });
 
-void speedTest() {
-  NetDiag net;
-  net.runSpeedTest();  
-}
+  // wait to finish before doing other tests
+  downThrd.join();
+  upThrd.join();
 
+  ICMP icmp;
+  icmp.startPings();
+}
 
 class NetMon {
   const int HEADER_HEIGHT = 4;
   const int MAIN_HEIGHT = 11;
-  const int MAIN_PANEL_WIDTH = 40;
+  const int MAIN_PANEL_WIDTH = 50;
   const int FOOTER_HEIGHT = 6;
 
   std::array<PanelStruct, 4> panels{};
 
-  std::atomic<bool> paused { false };
-  std::atomic<bool> shouldStop { false };
+  std::atomic<bool> shouldStop{false};
   std::condition_variable cv;
   std::mutex cvMutex;
   std::thread refreshThrd;
 
 public:
-  void run(int argc, char* argv[]) {
+  void run(int argc, char *argv[]) {
 
     initscr();            /* Start curses mode 		*/
     raw();                /* Line buffering disabled	*/
@@ -65,20 +67,20 @@ public:
     refreshThrd = std::thread([this] {
       while (!shouldStop) {
         std::unique_lock<std::mutex> lock(cvMutex);
-        cv.wait_for(lock, std::chrono::milliseconds(2000), [this] {
-          return shouldStop.load();
-        });
-        
-        if (!paused && !shouldStop) {
+        cv.wait_for(lock, std::chrono::milliseconds(2000),
+                    [this] { return shouldStop.load(); });
+
+        if (!shouldStop) {
           netstats::updateStats();
-          panels[1].panel->print(panels[1].window, MAIN_HEIGHT, MAIN_PANEL_WIDTH); // strength panel
-          panels[2].panel->print(panels[2].window, MAIN_HEIGHT, MAIN_PANEL_WIDTH); // speed panel
+          panels[1].panel->print(panels[1].window, MAIN_HEIGHT,
+                                 MAIN_PANEL_WIDTH); // strength panel
+          panels[2].panel->print(panels[2].window, MAIN_HEIGHT,
+                                 MAIN_PANEL_WIDTH); // speed panel
         }
       }
     });
 
-    std::thread pcktLossThr(packetLossTest);
-    std::thread spdTestThr(speedTest);
+    std::thread networkTestThrd(networkTest);
 
     while (true) {
       int ch = getch();
@@ -86,19 +88,15 @@ public:
       if (ch == 'q' || ch == 'Q') {
         break;
       }
-      if (ch == 'p' || ch == 'P') {
-        paused = !paused;
-      }
     }
 
     shouldStop = true; // tell thread to stop
-    cv.notify_all(); // wake up the thread
+    cv.notify_all();   // wake up the thread
 
     // join all threads
     if (refreshThrd.joinable()) {
       refreshThrd.join();
-      pcktLossThr.join();
-      spdTestThr.join();
+      networkTestThrd.join();
     }
 
     for (auto &panel : panels) {
@@ -113,12 +111,14 @@ public:
         std::ofstream stats("netmonlog.txt");
         stats << "avg latency: " << netstats::getStats().latency << "\n";
         stats << "sent packets: " << netstats::getStats().sentPackets << "\n";
-        stats << "% lost packets: " << netstats::getStats().lostPacketPcnt << "\n";
+        stats << "% lost packets: " << netstats::getStats().lostPacketPcnt
+              << "\n";
         stats << "jitter: " << netstats::getStats().jitter << "\n";
-        stats << "download speed: " << netstats::getStats().downloadSpeed.value << "mbps\n";
+        stats << "download speed: " << netstats::getStats().downloadSpeed.value
+              << "mbps\n";
       }
     }
-    
+
     endwin(); /* End curses mode		  */
   }
 
@@ -162,7 +162,7 @@ public:
   }
 };
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
   NetMon monitor;
   monitor.run(argc, argv);
   return 0;

@@ -15,10 +15,10 @@ void Bar::print(WINDOW *window, int height, int width) {
 
   int color;
   if (direction == colorDirection::normal) {
-    color = percent * 100.0f < 30 ? 1 : percent * 100.0f < 70 ? 2 : 3;  
+    color = percent * 100.0f < 40 ? 1 : percent * 100.0f < 70 ? 2 : 3;  
   }
   else {
-    color = percent * 100.0f < 30 ? 3 : percent * 100.0f < 70 ? 2 : 1;
+    color = percent * 100.0f < 20 ? 3 : percent * 100.0f < 50 ? 2 : 1;
   }
 
   // printing bar
